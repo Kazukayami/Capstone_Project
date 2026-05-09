@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model State {
+  id        Int        @id @default(autoincrement())
+  name      String
+  code      String     @unique
+  districts District[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([name])
+}
+
+model District {
+  id           Int           @id @default(autoincrement())
+  name         String
+  code         String
+  stateId      Int
+  state        State         @relation(fields: [stateId], references: [id], onDelete: Cascade)
+  subDistricts SubDistrict[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([stateId, code])
+  @@index([name])
+  @@index([stateId])
+}
+
+model SubDistrict {
+  id         Int       @id @default(autoincrement())
+  name       String
+  code       String
+  districtId Int
+  district   District  @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  villages   Village[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([districtId, code])
+  @@index([name])
+  @@index([districtId])
+}
+
+model Village {
+  id            Int         @id @default(autoincrement())
+  name          String
+  censusCode    String
+  pincode       String?
+  latitude      Decimal?    @db.Decimal(10, 7)
+  longitude     Decimal?    @db.Decimal(10, 7)
+  population    Int?
+  subDistrictId Int
+  subDistrict   SubDistrict @relation(fields: [subDistrictId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([subDistrictId, censusCode])
+  @@index([name])
+  @@index([pincode])
+  @@index([subDistrictId])
+}
+
+model ApiClient {
+  id           Int           @id @default(autoincrement())
+  name         String
+  apiKey       String        @unique
+  apiSecret    String
+  active       Boolean       @default(true)
+  plan         String        @default("starter")
+  requests     ApiRequestLog[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model ApiRequestLog {
+  id           Int       @id @default(autoincrement())
+  apiClientId  Int
+  apiClient    ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  method       String
+  path         String
+  statusCode   Int
+  responseTime Int
+  ipAddress    String?
+  createdAt    DateTime  @default(now())
+
+  @@index([apiClientId])
+  @@index([createdAt])
+  @@index([path])
+}
+
