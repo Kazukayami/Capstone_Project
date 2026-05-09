@@ -1,0 +1,2 @@
+2026-05-09 15:46:00,000 | INFO | trading_bot | Order request summary | dry_run=True order={'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'LIMIT', 'quantity': '0.001', 'price': '120000'}
+2026-05-09 15:46:00,002 | INFO | trading_bot | Dry-run order response | response={'dryRun': True, 'orderId': 'DRY-RUN', 'status': 'VALIDATED', 'executedQty': '0', 'avgPrice': '0'}
